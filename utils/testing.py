@@ -1,11 +1,11 @@
-from sensors import initialize_sensorbridge, initialize_sensor, print_values
-from sensors import port
+# from sensors import initialize_sensorbridge, initialize_sensor, print_values
 import datetime
+from src.SensorData import SensorData
 
-bridge = initialize_sensorbridge(port)
-sensor = initialize_sensor(bridge)
+# bridge = initialize_sensorbridge(port)
+# sensor = initialize_sensor(bridge)
 
-def flow_rate(seconds):
+def flow_rate(sensor, seconds=30):
     flow_data = []
     endTime = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
     while datetime.datetime.now() <= endTime:
@@ -13,13 +13,22 @@ def flow_rate(seconds):
     # print(flow_data)
     return flow_data
 
-def temperature(seconds):
+def temperature(sensor, seconds=30):
     temperature_data = []
     endTime = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
     while datetime.datetime.now() <= endTime:
         temperature_data.append(sensor.read_continuous_measurement()[1])
     # print(temperature_data)
     return temperature_data
+
+def read_sensor_data(sensor, seconds=10):
+    flow_data = []
+    temp_data = []
+    endTime = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
+    while datetime.datetime.now() <= endTime:
+        flow_data.append(sensor.read_continuous_measurement()[0])
+        temp_data.append(sensor.read_continuous_measurement()[1])
+    return SensorData(seconds, flow_data, temp_data)
 
 def average(data):
     average = sum(data)/len(data)

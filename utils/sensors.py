@@ -13,7 +13,7 @@ logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logg
 # Connect to the SensorBridge with default settings:
 #  - baudrate:      460800
 #  - slave address: 0
-port = ShdlcSerialPort(port='/dev/tty.usbserial-EKS2713NFH', baudrate=460800)
+# port = ShdlcSerialPort(port='/dev/tty.usbserial-EKS2713NFH', baudrate=460800)
 
 # Initialize Sensorbridge
 def initialize_sensorbridge(port):
