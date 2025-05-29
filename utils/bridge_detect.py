@@ -13,3 +13,4 @@ def find_sensor_bridge():
             return port.device
 
 sensor_bridge = find_sensor_bridge()
+# print(sensor_bridge)

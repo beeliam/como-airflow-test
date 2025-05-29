@@ -37,13 +37,17 @@ def define_permille():
 # 1.) Stop any running measurement
 # 2.) Request scale factors and unit set on sensor
 # 3.) Start measurement
-def initialize_sensor(bridge, measure_mode=MeasurementMode.Air, permille = 200):
-    sensor = Sfm3019I2cSensorBridgeDevice(bridge, SensorBridgePort.ONE, slave_address=0x2E)
-    measure_mode = MeasurementMode.Air
-    permille = 200
-    sensor.initialize_sensor(measure_mode)
-    sensor.start_continuous_measurement(measure_mode, air_o2_mix_fraction_permille=permille)
-    return sensor
+def initialize_sensor_one(bridge, measure_mode=MeasurementMode.Air, permille = 200):
+    sensorOne = Sfm3019I2cSensorBridgeDevice(bridge, SensorBridgePort.ONE, slave_address=0x2E)
+    sensorOne.initialize_sensor(measure_mode)
+    sensorOne.start_continuous_measurement(measure_mode, air_o2_mix_fraction_permille=permille)
+    return sensorOne
+
+def initialize_sensor_two(bridge, measure_mode=MeasurementMode.Air, permille = 200):
+    sensorTwo = Sfm3019I2cSensorBridgeDevice(bridge, SensorBridgePort.TWO, slave_address=0x2E)
+    sensorTwo.initialize_sensor(measure_mode)
+    sensorTwo.start_continuous_measurement(measure_mode, air_o2_mix_fraction_permille=permille)
+    return sensorTwo
 
 # Read out product information
 def get_product_info(pid, sn, sensor):
