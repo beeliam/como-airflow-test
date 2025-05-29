@@ -12,8 +12,8 @@ with ShdlcSerialPort(port=bridge_port, baudrate=460800) as port:
 
     # sensorOne = initialize_sensor_one(bridge)
     # flowOne = flow_rate(sensorOne)
-    # # dataOne = read_sensor_data(sensorOne, 10)
     # print_values(sensorOne)
+    # dataOne = read_sensor_data(sensorOne, 10)
     # print(dataOne)
 
     sensorTwo = initialize_sensor_two(bridge)
