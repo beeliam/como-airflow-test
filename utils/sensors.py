@@ -18,36 +18,28 @@ logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logg
 # Initialize Sensorbridge
 def initialize_sensorbridge(port):
     bridge = SensorBridgeShdlcDevice(ShdlcConnection(port), slave_address=0)
-    # print("SensorBridge SN: {}".format(bridge.get_serial_number()))
-    bridge.set_i2c_frequency(SensorBridgePort.ONE, frequency=SFM3019_DEFAULT_I2C_FREQUENCY)
-    bridge.set_supply_voltage(SensorBridgePort.ONE, voltage=SFM3019_DEFAULT_VOLTAGE)
-    bridge.switch_supply_on(SensorBridgePort.ONE)
+    print("Initializing SensorBridge {}".format(bridge.get_serial_number()))
+    print("setting i2c frequency")
+    bridge.set_i2c_frequency(SensorBridgePort.ALL, frequency=SFM3019_DEFAULT_I2C_FREQUENCY)
+    print("setting supply voltage")
+    bridge.set_supply_voltage(SensorBridgePort.ALL, voltage=SFM3019_DEFAULT_VOLTAGE)
+    print("setting switch supply on")
+    bridge.switch_supply_on(SensorBridgePort.ALL)
+    # print("sleeping...")
+    # time.sleep(0.2)
     return bridge
-
-# Define gas (or gas mixes)
-def define_measurement_mode():
-    measure_mode = MeasurementMode.Air
-    return measure_mode
-
-def define_permille():
-    permille = 200  # only applies for gas mixes
-    return permille
 
 # Initialize sensor:
 # 1.) Stop any running measurement
 # 2.) Request scale factors and unit set on sensor
 # 3.) Start measurement
-def initialize_sensor_one(bridge, measure_mode=MeasurementMode.Air, permille = 200):
-    sensorOne = Sfm3019I2cSensorBridgeDevice(bridge, SensorBridgePort.ONE, slave_address=0x2E)
-    sensorOne.initialize_sensor(measure_mode)
-    sensorOne.start_continuous_measurement(measure_mode, air_o2_mix_fraction_permille=permille)
-    return sensorOne
-
-def initialize_sensor_two(bridge, measure_mode=MeasurementMode.Air, permille = 200):
-    sensorTwo = Sfm3019I2cSensorBridgeDevice(bridge, SensorBridgePort.TWO, slave_address=0x2E)
-    sensorTwo.initialize_sensor(measure_mode)
-    sensorTwo.start_continuous_measurement(measure_mode, air_o2_mix_fraction_permille=permille)
-    return sensorTwo
+def initialize_sensor(bridge, port, measure_mode=MeasurementMode.Air, permille = 200): #port=SensorBridgePort.ONE
+    print(f"initialize sensor {port}")
+    sensor = Sfm3019I2cSensorBridgeDevice(bridge, port, slave_address=0x2E)
+    sensor.initialize_sensor(measure_mode)
+    sensor.start_continuous_measurement(measure_mode, air_o2_mix_fraction_permille=permille)
+    print(f"initialized sensor {port}")
+    return sensor
 
 # Read out product information
 def get_product_info(pid, sn, sensor):
@@ -55,9 +47,19 @@ def get_product_info(pid, sn, sensor):
     print("SFM3019 SN: {}".format(sn))
     print("Flow unit of sensor: {} (Volume at temperature in degree Centigrade)".format(sensor.flow_unit))
 
-# Read them out continuously
+# Read data out continuously
 def print_values(sensor):
     while True:
         time.sleep(0.1)
         # print("Flow: {}, Temperature{}".format(*sensor.read_continuous_measurement()))
         print(sensor.read_continuous_measurement())
+
+
+# # Define gas (or gas mixes)
+# def define_measurement_mode():
+#     measure_mode = MeasurementMode.Air
+#     return measure_mode
+
+# def define_permille():
+#     permille = 200  # only applies for gas mixes
+#     return permille

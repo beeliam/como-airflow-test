@@ -9,8 +9,10 @@ def get_port_information():
 
 def find_sensor_bridge():
     for port in serial.tools.list_ports.comports():
+        print(f"Checking {port}")
         if port.manufacturer == 'Sensirion' and port.description == 'EKS2':
+            print(f"Found Sensirion Bridge: EKS2")
             return port.device
 
-sensor_bridge = find_sensor_bridge()
+# sensor_bridge = find_sensor_bridge()
 # print(sensor_bridge)

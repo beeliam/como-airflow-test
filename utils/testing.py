@@ -6,6 +6,7 @@ from src.SensorData import SensorData
 # sensor = initialize_sensor(bridge)
 
 def flow_rate(sensor, seconds=30):
+    print(f"Collecting flow rate data for {seconds} seconds")
     flow_data = []
     endTime = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
     while datetime.datetime.now() <= endTime:
@@ -14,6 +15,7 @@ def flow_rate(sensor, seconds=30):
     return flow_data
 
 def temperature(sensor, seconds=30):
+    print(f"Collecting temperature data for {seconds} seconds")
     temperature_data = []
     endTime = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
     while datetime.datetime.now() <= endTime:
@@ -21,7 +23,8 @@ def temperature(sensor, seconds=30):
     # print(temperature_data)
     return temperature_data
 
-def read_sensor_data(sensor, seconds=10):
+def read_sensor_data(sensor, seconds=30):
+    print(f"Collecting flow and temperature data for {seconds} seconds")
     flow_data = []
     temp_data = []
     endTime = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
