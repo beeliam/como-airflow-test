@@ -5,6 +5,7 @@ from src.SensorData import SensorData
 
 duration = 2
 bridge_ports = find_sensor_bridges()
+sensor_data_instances = []
 
 for i, bridge_port  in enumerate(bridge_ports):
     # print(" ")
@@ -19,7 +20,9 @@ for i, bridge_port  in enumerate(bridge_ports):
             if sensor:
                 print(" ")
                 print(f"Starting port: {sensor_port+1} on Sensor Bridge: {bridge_port}")
-                flow = flow_rate(sensor, duration)
+                flow =flow_rate(sensor, duration)
+                sensor_data = SensorData(duration, flow)
+                sensor_data_instances.append(sensor_data)
                 # temp = temperature(sensor, duration)
                 print(" ")
                
@@ -28,8 +31,9 @@ for i, bridge_port  in enumerate(bridge_ports):
                 print(" ")
               
 
-data = SensorData(duration, flow)
+for i, data in enumerate(sensor_data_instances):
+    print(f'Sensor: {i+1} average flow: {data.get_average_flow_rate()} SLM')
 
-avg_flow_rate = SensorData.get_average_flow_rate(data)
+# avg_flow_rate = SensorData.get_average_flow_rate(data)
 
-print(avg_flow_rate)
+# print(avg_flow_rate)
