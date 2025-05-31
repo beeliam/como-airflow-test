@@ -14,22 +14,22 @@ from sensirion_sensorbridge_i2c_sfm.sfm3019.sfm3019_constants import SFM3019_DEF
 logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.ERROR)
 
 #check device data to identify sensor bridges
-def find_sensor_bridges():
-    """check port data to identify sensirion sensor bridges"""
-    sensor_bridges=[]
+def find_bridges():
+    """check serial port data to identify sensirion sensor bridges"""
+    bridges=[]
     for port in serial.tools.list_ports.comports():
         # print(f"Checking {port}")
         if port.manufacturer == 'Sensirion' and port.description == 'EKS2':
             print(f"Found Sensirion Bridge: {port.device}")
-            sensor_bridges.append(port.device)
-    return sensor_bridges
+            bridges.append(port.device)
+    return bridges
 
 # initialize Sensorbridge
-def initialize_sensorbridge(port):
+def initialize_bridge(serial_port):
     """initialize sensirion sensor bridge"""
     try:
-        logging.info(f"Attempting to open bridge at {port}")
-        bridge = SensorBridgeShdlcDevice(ShdlcConnection(port), slave_address=0)
+        logging.info(f"Attempting to open bridge at {serial_port}")
+        bridge = SensorBridgeShdlcDevice(ShdlcConnection(serial_port), slave_address=0)
         logging.info("Initializing SensorBridge {}".format(bridge.get_serial_number()))
         # print("setting i2c frequency")
         bridge.set_i2c_frequency(SensorBridgePort.ALL, frequency=SFM3019_DEFAULT_I2C_FREQUENCY)
@@ -37,28 +37,28 @@ def initialize_sensorbridge(port):
         bridge.set_supply_voltage(SensorBridgePort.ALL, voltage=SFM3019_DEFAULT_VOLTAGE)
         # print("setting switch supply on")
         bridge.switch_supply_on(SensorBridgePort.ALL)
-        return bridge
+        return bridge # sensirion bridge object !!!
     except Exception as e:
-        logging.warning(f"Failed to initialize bridge at {port}: {e}")
+        logging.warning(f"Failed to initialize bridge at {serial_port}: {e}")
         return None, None
 
 # initialize sensor and start measurement
-def initialize_sensor(bridge, port, measure_mode=MeasurementMode.Air, permille = 200): #port=SensorBridgePort.ONE
+def initialize_sensor(bridge, bridge_port, measure_mode=MeasurementMode.Air, permille = 200): #port=SensorBridgePort.ONE
     """initialize individual sensors connected to sensor bridge ports"""
     try:
-        logging.info(f"Attempting to initialize sensor on {port}")
-        sensor = Sfm3019I2cSensorBridgeDevice(bridge, port, slave_address=0x2E)
+        logging.info(f"Attempting to initialize sensor on {bridge_port}")
+        sensor = Sfm3019I2cSensorBridgeDevice(bridge, bridge_port, slave_address=0x2E)
         sensor.initialize_sensor(measure_mode)
         sensor.start_continuous_measurement(measure_mode, air_o2_mix_fraction_permille=permille)
-        logging.info(f"initialized sensor {port}")
+        logging.info(f"initialized sensor {bridge_port}")
         return sensor
     except (ShdlcDeviceError, ShdlcTimeoutError, AttributeError, OSError) as e:
-        logging.warning(f"No sensor found on {port} or failed to initialize -- skipping. ({type(e).__name__}")
+        logging.warning(f"No sensor found on {bridge_port} or failed to initialize -- skipping. ({type(e).__name__}")
 
 #start flow_rate measurement
-def flow_rate(sensor, seconds=30):
+def flow_rate(sensor, seconds=30): # sensirion sensor object
     """begin collecting flow rate data over a specified time interval"""
-    print(f"Collecting flow rate data for {seconds} seconds")
+    print(f"collecting flow rate data for {seconds} seconds")
     flow_data = []
     endTime = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
     while datetime.datetime.now() <= endTime:
@@ -67,9 +67,9 @@ def flow_rate(sensor, seconds=30):
     return flow_data
 
 #start temperature measurement
-def temperature(sensor, seconds=30):
+def temperature(sensor: Sfm3019I2cSensorBridgeDevice, seconds=30):
     """begin collecting temperature data over a specified time interval"""
-    print(f"Collecting temperature data for {seconds} seconds")
+    print(f"collecting temperature data for {seconds} seconds")
     temperature_data = []
     endTime = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
     while datetime.datetime.now() <= endTime:
@@ -85,7 +85,7 @@ def get_product_info(pid, sn, sensor):
     print("Flow unit of sensor: {} (Volume at temperature in degree Centigrade)".format(sensor.flow_unit))
 
 # print sensor data continuously
-def print_values(sensor):
+def print_values(sensor: Sfm3019I2cSensorBridgeDevice):
     """continuously print sensor values to terminal"""
     while True:
         time.sleep(0.1)
