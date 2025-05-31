@@ -3,7 +3,9 @@ import logging
 import time
 import serial.tools.list_ports
 
-from sensirion_shdlc_driver import ShdlcConnection, ShdlcSerialPort
+from src.SensorData import SensorData
+
+from sensirion_shdlc_driver import ShdlcConnection
 from sensirion_shdlc_driver.errors import ShdlcDeviceError, ShdlcTimeoutError
 from sensirion_shdlc_sensorbridge import SensorBridgePort, SensorBridgeShdlcDevice
 
@@ -77,6 +79,15 @@ def temperature(sensor: Sfm3019I2cSensorBridgeDevice, seconds=30):
     # print(temperature_data)
     return temperature_data
 
+def async_measurement(sensor: Sfm3019I2cSensorBridgeDevice, seconds: int, result_queue):
+    print(f"collecting flow rate data for {seconds} seconds")
+    flow_data = []
+    endTime = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
+    while datetime.datetime.now() <= endTime:
+        flow_data.append(sensor.read_continuous_measurement()[0])
+    # print(flow_data)
+    result_queue.put(flow_data)
+    
 # print out product information
 def get_product_info(pid, sn, sensor):
     """read out product information for sensors"""

@@ -1,7 +1,7 @@
 import datetime
 
 class SensorData:
-    def __init__(self, duration, flow_rate, temperature=None) -> None:
+    def __init__(self, flow_rate, duration, temperature=None)-> None:
         self.duration = duration # duration of readings - seconds
         self.flow_rate: list[float] = flow_rate # list of readings - SLM
         self.temperature: list[float] = temperature if temperature is not None else [] # list of reading - Celsius
