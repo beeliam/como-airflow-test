@@ -18,17 +18,13 @@ for i, bridge_port  in enumerate(bridge_ports):
         for sensor_port in [SensorBridgePort.ONE, SensorBridgePort.TWO]:
             sensor = initialize_sensor(bridge, sensor_port)
             if sensor:
-                print(" ")
-                print(f"Starting port: {sensor_port+1} on Sensor Bridge: {bridge_port}")
-                flow =flow_rate(sensor, duration)
-                sensor_data = SensorData(duration, flow)
-                sensor_data_instances.append(sensor_data)
-                # temp = temperature(sensor, duration)
-                print(" ")
+                print(f"\nStarting port: {sensor_port+1} on Sensor Bridge: {bridge_port}\n")
+                flow = flow_rate(sensor, duration)
+                # temp = temperature(sensor, duration) #don't care about temp
+                sensor_data_instances.append(SensorData(duration, flow)) #Create SensorData object with duration and flow data then save into list
                
             else:
-                print(f"Skipped port: {sensor_port+1} on Sensor Bridge: {bridge_port}")
-                print(" ")
+                print(f"Skipped port: {sensor_port+1} on Sensor Bridge: {bridge_port}\n")
               
 
 for i, data in enumerate(sensor_data_instances):
