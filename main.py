@@ -1,31 +1,35 @@
-from utils.sensors import initialize_sensorbridge, initialize_sensor, print_values
-from utils.testing import flow_rate, temperature, average, read_sensor_data
-from sensirion_shdlc_driver import ShdlcSerialPort
 from sensirion_shdlc_sensorbridge import SensorBridgePort
+from sensirion_shdlc_driver import ShdlcSerialPort
+from utils.sensors import find_sensor_bridges, initialize_sensorbridge, initialize_sensor, flow_rate, temperature
+from src.SensorData import SensorData
 
-from utils.bridge_detect import find_sensor_bridge
+duration = 2
+bridge_ports = find_sensor_bridges()
 
-bridge_port = find_sensor_bridge()
+for i, bridge_port  in enumerate(bridge_ports):
+    # print(" ")
+    # print(f"Using bridge {i+1} on port {bridge_port}")
 
-with ShdlcSerialPort(port=bridge_port, baudrate=460800) as port:
+    with ShdlcSerialPort(port=bridge_port, baudrate=460800) as port:
 
-    bridge = initialize_sensorbridge(port)
+        bridge = initialize_sensorbridge(port)
 
-    sensor = initialize_sensor(bridge, SensorBridgePort.ONE)
-    flow = flow_rate(sensor,10)
-    # print_values(sensorOne)
-    # dataOne = read_sensor_data(sensorOne, 10)
-    print(f'Sensor one flow data: {flow}')
+        for sensor_port in [SensorBridgePort.ONE, SensorBridgePort.TWO]:
+            sensor = initialize_sensor(bridge, sensor_port)
+            if sensor:
+                print(" ")
+                print(f"Starting port: {sensor_port+1} on Sensor Bridge: {bridge_port}")
+                flow = flow_rate(sensor, duration)
+                # temp = temperature(sensor, duration)
+                print(" ")
+               
+            else:
+                print(f"Skipped port: {sensor_port+1} on Sensor Bridge: {bridge_port}")
+                print(" ")
+              
 
-    sensor = initialize_sensor(bridge, SensorBridgePort.TWO)
-    flow = flow_rate(sensor,10)
-    # print_values(sensorTwo)
-    # dataTwo = read_sensor_data(sensorTwo, 10)
-    print(f'Sensor two flow data: {flow}')
+data = SensorData(duration, flow)
 
-    # temp = temperature(sensor, 1)
-    # average_flow = average(flow)
-    # average_temp = average(temp)
-    
-    # average_sensor_flow = data.get_average_flow_rate()
-    # average_sensor_temp = data.get_average_temp()
+avg_flow_rate = SensorData.get_average_flow_rate(data)
+
+print(avg_flow_rate)

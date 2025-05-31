@@ -1,10 +1,10 @@
 import datetime
 
 class SensorData:
-    def __init__(self, duration, flow_rate, temperature) -> None:
+    def __init__(self, duration, flow_rate, temperature=None) -> None:
         self.duration = duration # duration of readings - seconds
-        self.flow_rate: list[float] = flow_rate # list of readings - CFM
-        self.temperature: list[float] = temperature # list of reading - Celsius
+        self.flow_rate: list[float] = flow_rate # list of readings - SLM
+        self.temperature: list[float] = temperature if temperature is not None else [] # list of reading - Celsius
 
     def get_average_temp(self) -> float:
         return sum(self.temperature)/len(self.temperature)
