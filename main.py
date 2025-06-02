@@ -31,8 +31,8 @@ for i, bridge_address in enumerate(bridge_addresses):
     serial_ports.append(serial_port)  # prevent GC + store for cleanup
     bridge = initialize_bridge(serial_port)
 
-    for bridge_port in [SensorBridgePort.TWO, SensorBridgePort.ONE]:
-        print(bridge_port) # Start with port #2 to determine which bridge we're on in first iteration of loop
+    for bridge_port in [SensorBridgePort.TWO, SensorBridgePort.ONE]:# Start with port #2 to determine which bridge we're on in first iteration of loop
+        # print(bridge_port)
         sensor = initialize_sensor(bridge, bridge_port)
 
         if sensor: # Sensor is plugged into port
