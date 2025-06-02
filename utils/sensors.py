@@ -79,7 +79,7 @@ def temperature(sensor: Sfm3019I2cSensorBridgeDevice, seconds=30):
     # print(temperature_data)
     return temperature_data
 
-def async_measurement(sensor: Sfm3019I2cSensorBridgeDevice, seconds: int, result_queue):
+def sync_measurement(sensor: Sfm3019I2cSensorBridgeDevice, seconds: int, result_queue):
     print(f"collecting flow rate data for {seconds} seconds")
     flow_data = []
     endTime = datetime.datetime.now() + datetime.timedelta(seconds=seconds)

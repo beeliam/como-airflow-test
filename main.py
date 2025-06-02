@@ -1,6 +1,6 @@
 from sensirion_shdlc_sensorbridge import SensorBridgePort 
 from sensirion_shdlc_driver import ShdlcSerialPort
-from utils.sensors import find_bridges, initialize_bridge, initialize_sensor, async_measurement, flow_rate
+from utils.sensors import find_bridges, initialize_bridge, initialize_sensor, sync_measurement, flow_rate
 from src.SensorData import SensorData
 import threading
 import queue
@@ -31,21 +31,27 @@ for i, bridge_address in enumerate(bridge_addresses):
     serial_ports.append(serial_port)  # prevent GC + store for cleanup
     bridge = initialize_bridge(serial_port)
 
-    for bridge_port in [SensorBridgePort.TWO, SensorBridgePort.ONE]: # Start with port #2 to determine which bridge we're on in first iteration of loop
+    for bridge_port in [SensorBridgePort.TWO, SensorBridgePort.ONE]:
+        print(bridge_port) # Start with port #2 to determine which bridge we're on in first iteration of loop
         sensor = initialize_sensor(bridge, bridge_port)
 
         if sensor: # Sensor is plugged into port
             if bridge_port == SensorBridgePort.TWO: # Port #2 on bridge has sensor connected - assume this is upper_bridge
                 upper_bridge = bridge
                 exhaust_sensor_1 = sensor
+                print('exhaust 1 found')
             else: # If we're on port #1 then we should have already determined what bridge we're on
-                if lower_bridge:
+                if lower_bridge == bridge:
                     exhaust_sensor_2 = sensor
+                    print('exhaust 2 found')
                 else:
                     intake_sensor = sensor
+                    print('intake found')
         else: # Sensor not plugged into port
+            print('no sensor on port 2')
             if bridge_port == SensorBridgePort.TWO: # Port #2 on bridge has no sensor - assume this is lower_bridge
                 lower_bridge = bridge
+                
             else: # Should not hit this - means sensors are not connected properly
                 print("ERROR: Sensor not detected in Port #1 for bridge(s)!")
                 sys.exit(1)
@@ -55,8 +61,9 @@ for i, bridge_address in enumerate(bridge_addresses):
 
 # Start threads for all sensors in sensor list
 for sensor in [intake_sensor, exhaust_sensor_1, exhaust_sensor_2]:
+    # print(f'thread {sensor}')
     if sensor:
-        thread = threading.Thread(target=async_measurement, args=(sensor, duration, result_queue))
+        thread = threading.Thread(target=sync_measurement, args=(sensor, duration, result_queue))
         thread.start()
         threads.append(thread)
 
