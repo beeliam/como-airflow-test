@@ -61,9 +61,14 @@ for i, bridge_address in enumerate(bridge_addresses):
 
 # Start threads for all sensors in sensor list
 for sensor in [intake_sensor, exhaust_sensor_1, exhaust_sensor_2]:
-    # print(f'thread {sensor}')
+    sensor_configs = [
+    ("intake", intake_sensor),
+    ("exhaust_1", exhaust_sensor_1),
+    ("exhaust_2", exhaust_sensor_2)
+]
+for label, sensor in sensor_configs:
     if sensor:
-        thread = threading.Thread(target=sync_measurement, args=(sensor, duration, result_queue))
+        thread = threading.Thread(target=sync_measurement, args=(sensor, duration, result_queue, label))
         thread.start()
         threads.append(thread)
 
@@ -73,13 +78,13 @@ for thread in threads:
 
 sensor_data_list = []
 while not result_queue.empty():
-    flow_data = result_queue.get()
-    sensor_data = SensorData(flow_data, duration)
+    label, flow_data = result_queue.get()
+    sensor_data = SensorData(flow_data, duration, label)
     sensor_data_list.append(sensor_data)
 
 # Print averaged results
 for i, data in enumerate(sensor_data_list):
-    print(f"Sensor #{i+1} average flow: {data.get_average_flow_rate():.2f} SLM")
+    print(f"Sensor ({data.sensor_label}) average flow: {SensorData(flow_data, duration).get_average_flow_rate():.2f} SLM")
 
 # Clean up ports
 for port in serial_ports:
