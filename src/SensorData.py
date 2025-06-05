@@ -13,3 +13,4 @@ class SensorData:
     def get_average_flow_rate(self) -> float:
         return sum(self.flow_rate)/len(self.flow_rate)
 
+
